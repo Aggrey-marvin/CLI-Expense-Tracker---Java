@@ -1,5 +1,9 @@
 package com.azijja.expense.tracker;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+
 public class ArgsProcessor {
     public static void procesArgs(String[] args) {
         String firstArg = args[0].toLowerCase();
@@ -27,12 +31,41 @@ public class ArgsProcessor {
             }
             System.out.println("\n");
             return;
+        } else if (args.length - 1 > expectedParams.length * 2) {
+            System.out.println("\n❌ Error: Too many parameters for command '" + command.name().toLowerCase() + "'");
+            System.out.print("Expected parameters: ");
+            for (String param : expectedParams) {
+                System.out.print("<" + param + "> ");
+            }
+            System.out.println("\n");
+            return;
+        }
+
+        String [] allArgs = new String[args.length - 1];
+        System.arraycopy(args, 1, allArgs, 0, args.length - 1);
+
+        for (String arg : expectedParams) {
+            if (!Arrays.asList(allArgs).contains(arg)) {
+                System.out.println("\n❌ Error: Missing parameter '<" + arg + ">' for command '" + command.name().toLowerCase() + "'\n");
+            }
+        }
+
+        ArrayList <String> commandArgs = new ArrayList<>();
+        ArrayList <String> commandValues = new ArrayList<>();
+
+        for (String arg : allArgs) {
+            if (Arrays.asList(expectedParams).contains(arg)) {
+                commandArgs.add(arg);
+            } else {
+                commandValues.add(arg);
+            }
         }
 
         switch (command) {
             case ADD:
                 System.out.println("Adding a new expense...");
-                // Further implementation here
+                int latestId = FileReader.readJsonFile("data" + File.separator + "expenses.json");
+                System.out.println("Latest ID: " + latestId);
                 break;
             case LIST:
                 System.out.println("Listing all expenses...");

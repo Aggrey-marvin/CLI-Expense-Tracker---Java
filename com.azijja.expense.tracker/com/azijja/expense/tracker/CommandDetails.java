@@ -12,9 +12,9 @@ public class CommandDetails {
         descriptions.put(Commands.SUMMARY, "View expense summary");
         descriptions.put(Commands.DELETE, "Remove an expense");
         
-        parameters.put(Commands.ADD, new String[]{"description", "amount"});
+        parameters.put(Commands.ADD, new String[]{"--description", "--amount"});
         parameters.put(Commands.LIST, new String[]{});
         parameters.put(Commands.SUMMARY, new String[]{});
-        parameters.put(Commands.DELETE, new String[]{"id"});
+        parameters.put(Commands.DELETE, new String[]{"--id"});
     }
 }
