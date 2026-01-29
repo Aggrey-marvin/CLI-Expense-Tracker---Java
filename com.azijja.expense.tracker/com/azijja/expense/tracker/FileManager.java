@@ -7,7 +7,7 @@ import java.nio.file.Paths;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class FileReader {
+public class FileManager {
     public static int readJsonFile(String filePath) {
         try {
             String content = new String(Files.readAllBytes(Paths.get(filePath)));
@@ -29,6 +29,14 @@ public class FileReader {
         } catch (Exception e) {
             // Empty file or invalid JSON
             return 0;
+        }
+    }
+
+    public static void writeExpenseToCsv(String filePath, String expenseData) {
+        try {
+            Files.write(Paths.get(filePath), (expenseData + System.lineSeparator()).getBytes(), java.nio.file.StandardOpenOption.CREATE, java.nio.file.StandardOpenOption.APPEND);
+        } catch (IOException e) {
+            System.out.println("Error writing to CSV file: " + e.getMessage());
         }
     }
 }

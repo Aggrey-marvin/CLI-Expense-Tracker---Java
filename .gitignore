@@ -23,5 +23,5 @@
 hs_err_pid*
 replay_pid*
 
-# Application data
-data/
+# Build output
+out/

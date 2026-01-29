@@ -3,6 +3,8 @@ package com.azijja.expense.tracker;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
+import java.text.SimpleDateFormat;
 
 public class ArgsProcessor {
     public static void procesArgs(String[] args) {
@@ -61,11 +63,21 @@ public class ArgsProcessor {
             }
         }
 
+        Date now = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String formattedDate = dateFormat.format(now);
+
         switch (command) {
             case ADD:
                 System.out.println("Adding a new expense...");
-                int latestId = FileReader.readJsonFile("data" + File.separator + "expenses.json");
-                System.out.println("Latest ID: " + latestId);
+                int latestId = FileManager.readJsonFile("out/data" + File.separator + "expenses.json");
+                String description = commandValues.get(commandArgs.indexOf("--description"));
+                double amount = Double.parseDouble(commandValues.get(commandArgs.indexOf("--amount")));
+
+                String expenseData = (latestId + 1) + "," + formattedDate + "," + description + "," + amount;
+                FileManager.writeExpenseToCsv("out/data" + File.separator + "expenses.csv", expenseData);
+
+                System.out.println("Date: " + formattedDate + ", Description: " + description + ", Amount: " + amount + ", ID: " + (latestId + 1));
                 break;
             case LIST:
                 System.out.println("Listing all expenses...");
