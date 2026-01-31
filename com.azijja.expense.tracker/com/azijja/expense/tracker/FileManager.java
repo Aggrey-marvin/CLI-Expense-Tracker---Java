@@ -39,4 +39,56 @@ public class FileManager {
             System.out.println("Error writing to CSV file: " + e.getMessage());
         }
     }
-}
+
+    public static void updateLatestTransactionId(int latestTransactionId) {
+        try {
+            String filePath = "out/data/expenses.json";
+            JSONArray expenses;
+            try {
+                String content = new String(Files.readAllBytes(Paths.get(filePath)));
+                expenses = new JSONArray(content);
+            } catch (IOException e) {
+                expenses = new JSONArray();
+            }
+
+            if (expenses.length() > 0) {
+                JSONObject latestEntry = expenses.getJSONObject(expenses.length() - 1);
+                latestEntry.put("id", latestTransactionId);
+            }
+
+            Files.write(Paths.get(filePath), expenses.toString(4).getBytes());
+        } catch (IOException e) {
+            System.out.println("Error updating JSON file: " + e.getMessage());
+        }
+    }
+
+    public static JSONArray readExpensesJson(String filePath) {
+        try {
+            JSONArray expenses = new JSONArray();
+            String content = new String(Files.readAllBytes(Paths.get(filePath)));
+            String[] lines = content.split(System.lineSeparator());
+            
+            boolean isFirstLine = true;
+            for (String line : lines) {
+                if (line.trim().isEmpty()) continue;
+                if (isFirstLine) {
+                    isFirstLine = false;
+                    continue; // Skip header row
+                }
+                String[] fields = line.split(",");
+                if (fields.length >= 4) {
+                    JSONObject expense = new JSONObject();
+                    expense.put("id", Integer.parseInt(fields[0].trim()));
+                    expense.put("date", fields[1].trim());
+                    expense.put("description", fields[2].trim());
+                    expense.put("amount", Double.parseDouble(fields[3].trim()));
+                    expenses.put(expense);
+                }
+            }
+            return expenses;
+        } catch (IOException e) {
+            return new JSONArray();
+        }
+        }
+    }
+
