@@ -1,8 +1,10 @@
 package com.azijja.expense.tracker;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -32,9 +34,9 @@ public class FileManager {
         }
     }
 
-    public static void writeExpenseToCsv(String filePath, String expenseData) {
+    public static void appendExpenseToCsv(String filePath, String expenseData) {
         try {
-            Files.write(Paths.get(filePath), (expenseData + System.lineSeparator()).getBytes(), java.nio.file.StandardOpenOption.CREATE, java.nio.file.StandardOpenOption.APPEND);
+            Files.write(Paths.get(filePath), (expenseData + System.lineSeparator()).getBytes(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
         } catch (IOException e) {
             System.out.println("Error writing to CSV file: " + e.getMessage());
         }
@@ -89,6 +91,15 @@ public class FileManager {
         } catch (IOException e) {
             return new JSONArray();
         }
-        }
     }
+
+    public static void writeExpenseToCsv (String filePath, String expenseData) {
+
+        try {
+                java.nio.file.Files.write(java.nio.file.Paths.get(filePath), expenseData.getBytes());
+            } catch (java.io.IOException e) {
+                System.out.println("Error updating CSV file: " + e.getMessage());
+            }
+    }
+}
 

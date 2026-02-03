@@ -11,7 +11,10 @@ public class Main {
             Tools.printWelcome();
             return;
         } else {
-            ArgsProcessor.procesArgs(args);
+            CommandArgsData cmdData = ArgsProcessor.processArgs(args);
+            if (cmdData != null) {
+                Executor.executeCommand(cmdData);
+            }
         }
     }
 }
