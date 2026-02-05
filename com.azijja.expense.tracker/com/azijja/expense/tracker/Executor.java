@@ -29,6 +29,12 @@ public class Executor {
     private static void handleAdd(ArrayList<String> commandArgs, ArrayList<String> valueArgs, String formattedDate) {
         int latestId = FileManager.readJsonFile("out/data" + File.separator + "expenses.json");
         String description = valueArgs.get(commandArgs.indexOf("--description"));
+        try {
+            Double.parseDouble(valueArgs.get(commandArgs.indexOf("--amount")));
+        } catch (NumberFormatException e) {
+            System.out.println("\n❌ Error: Invalid amount value. Please enter a valid number for '--amount'\n");
+            return;
+        }
         double amount = Double.parseDouble(valueArgs.get(commandArgs.indexOf("--amount")));
 
         String expenseData = (latestId + 1) + "," + formattedDate + "," + description + "," + amount;
@@ -58,8 +64,13 @@ public class Executor {
     }
 
     private static void handleDelete(ArrayList<String> commandArgs, ArrayList<String> valueArgs, String formattedDate) {
-        System.out.println("Deleting an expense...");
         JSONArray currentExpenses = FileManager.readExpensesJson("out/data" + File.separator + "expenses.csv");
+        try {
+            Integer.parseInt(valueArgs.get(commandArgs.indexOf("--id")));
+        } catch (NumberFormatException e) {
+            System.out.println("\n❌ Error: Invalid ID value. Please enter a valid number for '--id'\n");
+            return;
+        }
         int idToDelete = Integer.parseInt(valueArgs.get(commandArgs.indexOf("--id")));
         JSONArray updatedExpenses = new JSONArray();
         boolean found = false;
