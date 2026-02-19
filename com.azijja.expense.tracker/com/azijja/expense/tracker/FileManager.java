@@ -10,20 +10,23 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class FileManager {
-    public static int readJsonFile(String filePath) {
+    private static final String DATA_DIR = "out/data";
+    private static final String APP_JSON = DATA_DIR + "/app.json";
+    private static final String EXPENSES_CSV = DATA_DIR + "/expenses.csv";
+    private static final String CATEGORIES_CSV = DATA_DIR + "/categories.csv";
+
+    public static int getLatestId(String entity) {
         try {
-            String content = new String(Files.readAllBytes(Paths.get(filePath)));
-            JSONArray expenses = new JSONArray(content);
+            String content = new String(Files.readAllBytes(Paths.get(APP_JSON)));
+            JSONArray appData = new JSONArray(content);
             
-            int maxId = 0;
-            for (int i = 0; i < expenses.length(); i++) {
-                JSONObject expense = expenses.getJSONObject(i);
-                int id = expense.getInt("id");
-                if (id > maxId) {
-                    maxId = id;
-                }
+            if (entity.equals("expense")) {
+                return appData.getJSONObject(0).getInt("latestExpenseId");
+            } else if (entity.equals("category")) {
+                return appData.getJSONObject(0).getInt("latestCategoryId");
+            } else {
+                throw new IllegalArgumentException("Invalid entity type: " + entity);
             }
-            return maxId;
             
         } catch (IOException e) {
             // File doesn't exist yet
@@ -42,25 +45,21 @@ public class FileManager {
         }
     }
 
-    public static void updateLatestTransactionId(int latestTransactionId) {
+    public static void updateLatestRecordId(int latestId, String entity) {
         try {
-            String filePath = "out/data/expenses.json";
-            JSONArray expenses;
-            try {
-                String content = new String(Files.readAllBytes(Paths.get(filePath)));
-                expenses = new JSONArray(content);
-            } catch (IOException e) {
-                expenses = new JSONArray();
+            String content = new String(Files.readAllBytes(Paths.get(APP_JSON)));
+            JSONArray contentJson = new JSONArray(content);
+            JSONObject appData = contentJson.getJSONObject(0);
+
+            if (entity.equals("expense")) {
+                appData.put("latestExpenseId", latestId);
+            } else if (entity.equals("category")) {
+                appData.put("latestCategoryId", latestId);
             }
 
-            if (expenses.length() > 0) {
-                JSONObject latestEntry = expenses.getJSONObject(expenses.length() - 1);
-                latestEntry.put("id", latestTransactionId);
-            }
-
-            Files.write(Paths.get(filePath), expenses.toString(4).getBytes());
+            Files.write(Paths.get(APP_JSON), contentJson.toString(4).getBytes());
         } catch (IOException e) {
-            System.out.println("Error updating JSON file: " + e.getMessage());
+            System.out.println("Error: " + e.getMessage());
         }
     }
 
@@ -100,6 +99,14 @@ public class FileManager {
             } catch (java.io.IOException e) {
                 System.out.println("Error updating CSV file: " + e.getMessage());
             }
+    }
+
+    public static void appendCategoryToCsv(String categoryData) {
+        try {
+            Files.write(Paths.get(CATEGORIES_CSV), (categoryData + System.lineSeparator()).getBytes(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+        } catch (IOException e) {
+            System.out.println("Error writing to CSV file: " + e.getMessage());
+        }
     }
 }
 

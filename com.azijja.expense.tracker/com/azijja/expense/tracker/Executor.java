@@ -21,13 +21,16 @@ public class Executor {
             case DELETE:
                 handleDelete(cmdData.commandArgs(), cmdData.valueArgs(), cmdData.formattedDateString());
                 break;
+            case CREATE_CATEGORY:
+                handleCreateCategory(cmdData.commandArgs(), cmdData.valueArgs(), cmdData.formattedDateString());
+                break;
             default:
                 System.out.println("\n❌ Error: Command handler not implemented for '" + cmdData.command().name().toLowerCase() + "'\n");
         }
     }
 
     private static void handleAdd(ArrayList<String> commandArgs, ArrayList<String> valueArgs, String formattedDate) {
-        int latestId = FileManager.readJsonFile("out/data" + File.separator + "expenses.json");
+        int latestId = FileManager.getLatestId("expense");
         String description = valueArgs.get(commandArgs.indexOf("--description"));
         try {
             Double.parseDouble(valueArgs.get(commandArgs.indexOf("--amount")));
@@ -39,7 +42,7 @@ public class Executor {
 
         String expenseData = (latestId + 1) + "," + formattedDate + "," + description + "," + amount;
         FileManager.appendExpenseToCsv("out/data" + File.separator + "expenses.csv", expenseData);
-        FileManager.updateLatestTransactionId(latestId + 1);
+        FileManager.updateLatestRecordId(latestId + 1, "expense");
 
         System.out.println("Date: " + formattedDate + ", Description: " + description + ", Amount: " + amount + ", ID: " + (latestId + 1));
     }
@@ -97,5 +100,16 @@ public class Executor {
             FileManager.writeExpenseToCsv(filePath, csvContent.toString());
             System.out.println("Expense with ID " + idToDelete + " deleted successfully.");
         }  
+    }
+
+    private static void handleCreateCategory(ArrayList<String> commandArgs, ArrayList<String> valueArgs, String formattedDate) {
+        int latestId = FileManager.getLatestId("category");
+        String name = valueArgs.get(commandArgs.indexOf("--name"));
+
+        String categoryData = (latestId + 1) + "," + formattedDate + "," + name;
+        FileManager.appendCategoryToCsv(categoryData);
+        FileManager.updateLatestRecordId(latestId + 1, "category");
+
+        System.out.println("Date: " + formattedDate + ", Description: " + name + ", ID: " + (latestId + 1));
     }
 }

@@ -4,7 +4,10 @@ public enum Commands {
     ADD ("add"),
     LIST ("list"),
     SUMMARY ("summary"),
-    DELETE ("delete");
+    DELETE ("delete"),
+    CREATE_CATEGORY ("create_category"),
+    LIST_CATEGORIES ("list_categories"),
+    DELETE_CATEGORY ("delete_category");
 
     private final String name;
 

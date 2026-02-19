@@ -25,11 +25,11 @@ public class ArgsProcessor {
 
         // Confirm passed args number
         String [] expectedParams = command.getParameters();
-        if (args.length - 1 < expectedParams.length) {
+        if (args.length - 1 < expectedParams.length * 2) {
             System.out.println("\n❌ Error: Missing parameters for command '" + command.name().toLowerCase() + "'");
             System.out.print("Expected parameters: ");
             for (String param : expectedParams) {
-                System.out.print("<" + param + "> ");
+                System.out.print("<" + param + "> <value>");
             }
             System.out.println("\n");
             return null;

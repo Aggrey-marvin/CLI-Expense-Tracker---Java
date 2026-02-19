@@ -9,8 +9,9 @@ import java.nio.file.Paths;
 
 public class SetupManager {
     private static final String DATA_DIR = "out/data";
-    private static final String EXPENSES_JSON = DATA_DIR + "/expenses.json";
+    private static final String EXPENSES_JSON = DATA_DIR + "/app.json";
     private static final String EXPENSES_CSV = DATA_DIR + "/expenses.csv";
+    private static final String CATEGORIES_CSV = DATA_DIR + "/categories.csv";
     
     public static void initialize() {
         try {
@@ -21,13 +22,13 @@ public class SetupManager {
                 System.out.println("✓ Created data directory");
             }
             
-            // Create expenses.json if it doesn't exist
+            // Create app.json if it doesn't exist
             File jsonFile = new File(EXPENSES_JSON);
             if (!jsonFile.exists()) {
                 try (FileWriter writer = new FileWriter(jsonFile)) {
-                    writer.write("[{\"id\":0}]");
+                    writer.write("[{\"latestExpenseId\":0, \"latestCategoryId\":0}]");
                 }
-                System.out.println("✓ Created expenses.json");
+                System.out.println("✓ Created app.json");
             }
             
             // Create expenses.csv if it doesn't exist
@@ -37,6 +38,15 @@ public class SetupManager {
                     writer.write("id,description,amount,date\n");
                 }
                 System.out.println("✓ Created expenses.csv with headers");
+            }
+            
+            // Create categories.csv if it doesn't exist
+            File categoriesFile = new File(CATEGORIES_CSV);
+            if (!categoriesFile.exists()) {
+                try (FileWriter writer = new FileWriter(categoriesFile)) {
+                    writer.write("id,name\n");
+                }
+                System.out.println("✓ Created categories.csv with headers");
             }
             
             System.out.println("\n✅ Setup completed successfully!\n");
