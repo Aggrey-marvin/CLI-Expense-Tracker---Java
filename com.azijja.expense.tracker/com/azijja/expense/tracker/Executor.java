@@ -24,6 +24,9 @@ public class Executor {
             case CREATE_CATEGORY:
                 handleCreateCategory(cmdData.commandArgs(), cmdData.valueArgs(), cmdData.formattedDateString());
                 break;
+            case LIST_CATEGORIES:
+                handlelistCategories(cmdData.commandArgs(), cmdData.valueArgs(), cmdData.formattedDateString());
+                break;
             default:
                 System.out.println("\n❌ Error: Command handler not implemented for '" + cmdData.command().name().toLowerCase() + "'\n");
         }
@@ -111,5 +114,20 @@ public class Executor {
         FileManager.updateLatestRecordId(latestId + 1, "category");
 
         System.out.println("Date: " + formattedDate + ", Description: " + name + ", ID: " + (latestId + 1));
+    }
+
+    private static void handlelistCategories(ArrayList<String> commandArgs, ArrayList<String> valueArgs, String formattedDate) {
+        JSONArray categories = FileManager.getCategories();
+
+        if (categories.length() < 1) {
+            System.out.println("There are no categories");
+            return;
+        }
+
+        System.out.println("# ID  Date          Name");
+        for (int i = 0; i < categories.length(); i++) {
+            JSONObject category = categories.getJSONObject(i);
+            System.out.printf("# %-3d %-10s    %-15s%n", category.getInt("id"), category.getString("date"), category.getString("name"));
+        }
     }
 }

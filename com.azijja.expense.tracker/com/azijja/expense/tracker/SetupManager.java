@@ -4,12 +4,11 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class SetupManager {
     private static final String DATA_DIR = "out/data";
-    private static final String EXPENSES_JSON = DATA_DIR + "/app.json";
+    private static final String APP_JSON = DATA_DIR + "/app.json";
     private static final String EXPENSES_CSV = DATA_DIR + "/expenses.csv";
     private static final String CATEGORIES_CSV = DATA_DIR + "/categories.csv";
     
@@ -23,7 +22,7 @@ public class SetupManager {
             }
             
             // Create app.json if it doesn't exist
-            File jsonFile = new File(EXPENSES_JSON);
+            File jsonFile = new File(APP_JSON);
             if (!jsonFile.exists()) {
                 try (FileWriter writer = new FileWriter(jsonFile)) {
                     writer.write("[{\"latestExpenseId\":0, \"latestCategoryId\":0}]");
@@ -44,7 +43,7 @@ public class SetupManager {
             File categoriesFile = new File(CATEGORIES_CSV);
             if (!categoriesFile.exists()) {
                 try (FileWriter writer = new FileWriter(categoriesFile)) {
-                    writer.write("id,name\n");
+                    writer.write("id,date,name\n");
                 }
                 System.out.println("✓ Created categories.csv with headers");
             }
@@ -57,8 +56,8 @@ public class SetupManager {
     }
     
     public static boolean isSetupComplete() {
-        return Files.exists(Paths.get(EXPENSES_JSON)) && 
-               Files.exists(Paths.get(EXPENSES_CSV));
+        return Files.exists(Paths.get(APP_JSON)) && 
+               Files.exists(Paths.get(EXPENSES_CSV)) && Files.exists(Paths.get(CATEGORIES_CSV));
     }
     
     // Main method to run setup independently

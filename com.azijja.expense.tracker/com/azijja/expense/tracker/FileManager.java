@@ -108,5 +108,35 @@ public class FileManager {
             System.out.println("Error writing to CSV file: " + e.getMessage());
         }
     }
+
+    public static JSONArray getCategories() {
+        try {
+            JSONArray categories = new JSONArray();
+            String content = new String(Files.readAllBytes(Paths.get(CATEGORIES_CSV)));
+            String[] lines = content.split(System.lineSeparator());
+
+            boolean isFirstLine = true;
+            for (String line : lines) {
+                if (line.trim().isEmpty()) continue;
+                if (isFirstLine) {
+                    isFirstLine = false;
+                    continue; // Skip header row
+                }
+                String[] fields = line.split(",");
+                if (fields.length >= 2) {
+                    JSONObject category = new JSONObject();
+                    category.put("id", Integer.parseInt(fields[0].trim()));
+                    category.put("date", fields[1].trim());
+                    category.put("name", fields[2].trim());
+                    categories.put(category);
+                }
+            }
+
+            return categories;
+        } catch (IOException e) {
+            System.out.println("Error reading from CSV file: " + e.getMessage());
+            return null;
+        }
+    }
 }
 
