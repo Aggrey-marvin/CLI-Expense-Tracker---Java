@@ -2,6 +2,7 @@ package com.azijja.expense.tracker;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -46,8 +47,33 @@ public class Executor {
         }
         double amount = Double.parseDouble(valueArgs.get(commandArgs.indexOf("--amount")));
 
+        Scanner scanner = new Scanner(System.in);
+        printCategories();
+        System.out.print("Enter category ID for this expense (default is 1 for 'Uncategorized'): ");
+        String categoryInput = scanner.nextLine().trim();
+        int categoryId = 1; // Default to 'Uncategorized'
+        if (!categoryInput.isEmpty()) {
+            try {
+                Integer.parseInt(categoryInput);
+            } catch (NumberFormatException e) {
+                System.out.println("\n❌ Error: Invalid category ID. Please enter a valid number for category ID\n");
+                scanner.close();
+                return;
+            }
+            categoryId = Integer.parseInt(categoryInput);
+        }
+        scanner.close();
+
+        String expenseFileName = FileManager.getExpenseFileName(categoryId);
+
+        File categoryFile = new File(expenseFileName);
+        if (!categoryFile.exists()) {
+            System.out.println("\n❌ Error: Category with ID " + categoryId + " does not exist. Please create the category first before adding expenses to it.\n");
+            return;
+        }
+
         String expenseData = (latestId + 1) + "," + formattedDate + "," + description + "," + amount;
-        FileManager.appendExpenseToCsv("out/data" + File.separator + "expenses.csv", expenseData);
+        FileManager.appendExpenseToCsv(expenseFileName, expenseData);
         FileManager.updateLatestRecordId(latestId + 1, "expense");
 
         System.out.println("Date: " + formattedDate + ", Description: " + description + ", Amount: " + amount + ", ID: " + (latestId + 1));
@@ -126,6 +152,8 @@ public class Executor {
         FileManager.updateCategoryToCsv(categoryData, true);
         FileManager.updateLatestRecordId(latestId + 1, "category");
 
+        SetupManager.createCategoryFile(latestId + 1);
+
         System.out.println("Date: " + formattedDate + ", Description: " + name + ", ID: " + (latestId + 1));
     }
 
@@ -184,5 +212,10 @@ public class Executor {
         } else {
             System.out.println("\n❌ Error: Category with ID " + idToDelete + " not found.\n");
         }
+    }
+
+    public static void printCategories() {
+        System.out.println("\n📂 Expense Categories:");
+        Executor.handlelistCategories(null, null, null);
     }
 }

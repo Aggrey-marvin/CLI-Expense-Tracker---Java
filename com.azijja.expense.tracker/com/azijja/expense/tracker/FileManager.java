@@ -142,5 +142,13 @@ public class FileManager {
             return null;
         }
     }
+
+    public static String getExpenseFileName(int categoryId) {
+        if (categoryId == 1) {
+            return EXPENSES_CSV;
+        } else {
+            return DATA_DIR + "/expense_category_" + categoryId + ".csv";
+        }
+    }
 }
 

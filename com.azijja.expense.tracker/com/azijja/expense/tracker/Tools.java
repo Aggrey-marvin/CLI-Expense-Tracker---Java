@@ -1,5 +1,7 @@
 package com.azijja.expense.tracker;
 
+import java.util.Locale.Category;
+
 public class Tools {
     public static void printWelcome() {
         System.out.println("\n╔════════════════════════════════════════════════════════════╗");
@@ -17,4 +19,6 @@ public class Tools {
         
         System.out.println("\n💡 Tip: Type a command to get started!\n");
     }
-}
+
+    
+ }   

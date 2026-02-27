@@ -71,4 +71,13 @@ public class SetupManager {
         System.out.println("\n🔧 Running Expense Tracker Setup...\n");
         initialize();
     }
+
+    public static void createCategoryFile(int id) {
+        File categoriesFile = new File(DATA_DIR + "/expense_category_" + id + ".csv");
+        try (FileWriter writer = new FileWriter(categoriesFile)) {
+            writer.write("id,description,amount,date\n");
+        } catch (IOException e) {
+            System.out.println("Error writing to CSV file: " + e.getMessage());
+        }
+    }
 }
