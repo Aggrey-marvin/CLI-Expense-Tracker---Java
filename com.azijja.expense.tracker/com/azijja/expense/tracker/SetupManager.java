@@ -5,6 +5,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class SetupManager {
     private static final String DATA_DIR = "out/data";
@@ -25,7 +27,7 @@ public class SetupManager {
             File jsonFile = new File(APP_JSON);
             if (!jsonFile.exists()) {
                 try (FileWriter writer = new FileWriter(jsonFile)) {
-                    writer.write("[{\"latestExpenseId\":0, \"latestCategoryId\":0}]");
+                    writer.write("[{\"latestExpenseId\":0, \"latestCategoryId\":1}]");
                 }
                 System.out.println("✓ Created app.json");
             }
@@ -42,8 +44,12 @@ public class SetupManager {
             // Create categories.csv if it doesn't exist
             File categoriesFile = new File(CATEGORIES_CSV);
             if (!categoriesFile.exists()) {
+                Date now = new Date();
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                String formattedDate = dateFormat.format(now);
+
                 try (FileWriter writer = new FileWriter(categoriesFile)) {
-                    writer.write("id,date,name\n");
+                    writer.write("id,date,name\n1," + formattedDate + ",Uncategorized\n");
                 }
                 System.out.println("✓ Created categories.csv with headers");
             }

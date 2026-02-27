@@ -27,6 +27,9 @@ public class Executor {
             case LIST_CATEGORIES:
                 handlelistCategories(cmdData.commandArgs(), cmdData.valueArgs(), cmdData.formattedDateString());
                 break;
+            case DELETE_CATEGORY:
+                handleDeleteCategory(cmdData.commandArgs(), cmdData.valueArgs(), cmdData.formattedDateString());
+                break;
             default:
                 System.out.println("\n❌ Error: Command handler not implemented for '" + cmdData.command().name().toLowerCase() + "'\n");
         }
@@ -109,8 +112,18 @@ public class Executor {
         int latestId = FileManager.getLatestId("category");
         String name = valueArgs.get(commandArgs.indexOf("--name"));
 
+        // Make sure category name is unique
+        JSONArray existingCategories = FileManager.getCategories();
+        for (int i = 0; i < existingCategories.length(); i++) {
+            JSONObject category = existingCategories.getJSONObject(i);
+            if (category.getString("name").equalsIgnoreCase(name)) {
+                System.out.println("\n❌ Error: Category name '" + name + "' already exists. Please choose a different name.\n");
+                return;
+            }
+        }
+
         String categoryData = (latestId + 1) + "," + formattedDate + "," + name;
-        FileManager.appendCategoryToCsv(categoryData);
+        FileManager.updateCategoryToCsv(categoryData, true);
         FileManager.updateLatestRecordId(latestId + 1, "category");
 
         System.out.println("Date: " + formattedDate + ", Description: " + name + ", ID: " + (latestId + 1));
@@ -128,6 +141,48 @@ public class Executor {
         for (int i = 0; i < categories.length(); i++) {
             JSONObject category = categories.getJSONObject(i);
             System.out.printf("# %-3d %-10s    %-15s%n", category.getInt("id"), category.getString("date"), category.getString("name"));
+        }
+    }
+
+    private static void handleDeleteCategory(ArrayList<String> commandArgs, ArrayList<String> valueArgs, String formattedDate) {
+        JSONArray currentCategories = FileManager.getCategories();
+        int idToDelete;
+        try {
+            idToDelete = Integer.parseInt(valueArgs.get(commandArgs.indexOf("--id")));
+        } catch (NumberFormatException e) {
+            System.out.println("\n❌ Error: Invalid ID value. Please enter a valid number for '--id'\n");
+            return;
+        }
+
+        if (idToDelete == 1) {
+            System.out.println("\n❌ Error: Cannot delete the default 'Uncategorized' category.\n");
+            return;
+        }
+
+        JSONArray updatedCategories = new JSONArray();
+        boolean found = false;
+        for (int i = 0; i < currentCategories.length(); i++) {
+            JSONObject category = currentCategories.getJSONObject(i);
+            if (category.getInt("id") != idToDelete) {
+                updatedCategories.put(category);
+            } else {
+                found = true;
+            }
+        }
+        if (found) {
+            // Rewrite CSV file
+            StringBuilder csvContent = new StringBuilder("id,date,name\n");
+            for (int i = 0; i < updatedCategories.length(); i++) {
+                JSONObject category = updatedCategories.getJSONObject(i);
+                csvContent.append(category.getInt("id")).append(",")
+                            .append(category.getString("date")).append(",")
+                            .append(category.getString("name")).append("\n");
+            }
+
+            FileManager.updateCategoryToCsv(csvContent.toString(), false);
+            System.out.println("Category with ID " + idToDelete + " deleted successfully.");
+        } else {
+            System.out.println("\n❌ Error: Category with ID " + idToDelete + " not found.\n");
         }
     }
 }

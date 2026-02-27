@@ -101,9 +101,13 @@ public class FileManager {
             }
     }
 
-    public static void appendCategoryToCsv(String categoryData) {
+    public static void updateCategoryToCsv(String categoryData, Boolean append) {
         try {
-            Files.write(Paths.get(CATEGORIES_CSV), (categoryData + System.lineSeparator()).getBytes(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+            if (append) {
+                Files.write(Paths.get(CATEGORIES_CSV), (categoryData + System.lineSeparator()).getBytes(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+            } else {
+                Files.write(Paths.get(CATEGORIES_CSV), categoryData.getBytes());
+            }
         } catch (IOException e) {
             System.out.println("Error writing to CSV file: " + e.getMessage());
         }
