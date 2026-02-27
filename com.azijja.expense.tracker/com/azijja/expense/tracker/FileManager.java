@@ -150,5 +150,29 @@ public class FileManager {
             return DATA_DIR + "/expense_category_" + categoryId + ".csv";
         }
     }
+
+    public static ExpenseFileData getExpenseFiles() {
+        File dataDir = new File(DATA_DIR);
+        File[] files = dataDir.listFiles((dir, name) -> name.startsWith("expense") && name.endsWith(".csv"));
+        if (files != null) {
+            String[] fileNames = new String[files.length];
+            int [] categoryIds = new int[files.length];
+            for (int i = 0; i < files.length; i++) {
+                fileNames[i] = files[i].getName();
+                String[] parts = files[i].getName().split("_");
+                if (parts.length >= 3) {
+                    try {
+                        categoryIds[i] = Integer.parseInt(parts[2].replace(".csv", ""));
+                    } catch (NumberFormatException e) {
+                        categoryIds[i] = 1; // Default to 'Uncategorized' if parsing fails
+                    }
+                } else {
+                    categoryIds[i] = 1; // Default to 'Uncategorized' if format is unexpected
+                }
+            }
+            return new ExpenseFileData(fileNames, categoryIds);
+        }
+        return new ExpenseFileData(new String[0], new int[0]);
+    }
 }
 

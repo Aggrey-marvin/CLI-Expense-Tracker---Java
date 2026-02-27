@@ -80,6 +80,10 @@ public class Executor {
     }
 
     private static void handleList(ArrayList<String> commandArgs, ArrayList<String> valueArgs, String formattedDate) {
+        ExpenseFileData expenseFilesData = FileManager.getExpenseFiles();
+
+        // To continue from there later....
+
         JSONArray expenses = FileManager.readExpensesJson("out/data" + File.separator + "expenses.csv");
         System.out.println("# ID  Date        Description      Amount");
         for (int i = 0; i < expenses.length(); i++) {
