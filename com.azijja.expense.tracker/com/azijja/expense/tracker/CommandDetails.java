@@ -5,6 +5,7 @@ import java.util.EnumMap;
 public class CommandDetails {
     public static final EnumMap<Commands, String> descriptions = new EnumMap<Commands, String>(Commands.class);
     public static final EnumMap<Commands, String[]> parameters = new EnumMap<Commands, String[]>(Commands.class);
+    public static final EnumMap<Commands, String[]> optionalParameters = new EnumMap<Commands, String[]>(Commands.class);
     
     static {
         descriptions.put(Commands.ADD, "Add a new expense");
@@ -22,5 +23,7 @@ public class CommandDetails {
         parameters.put(Commands.CREATE_CATEGORY, new String[]{"--name"});
         parameters.put(Commands.LIST_CATEGORIES, new String[]{});
         parameters.put(Commands.DELETE_CATEGORY, new String[]{"--id"});
+
+        optionalParameters.put(Commands.LIST, new String[]{"--category"});
     }
 }

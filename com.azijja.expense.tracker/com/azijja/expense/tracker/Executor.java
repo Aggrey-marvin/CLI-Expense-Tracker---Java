@@ -2,6 +2,7 @@ package com.azijja.expense.tracker;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 
 import org.json.JSONArray;
@@ -82,13 +83,58 @@ public class Executor {
     private static void handleList(ArrayList<String> commandArgs, ArrayList<String> valueArgs, String formattedDate) {
         ExpenseFileData expenseFilesData = FileManager.getExpenseFiles();
 
-        // To continue from there later....
+        if (commandArgs.contains("--category")) {
+            int categoryId;
+            try {
+                categoryId = Integer.parseInt(valueArgs.get(commandArgs.indexOf("--category")));
+            } catch (NumberFormatException e) {
+                System.out.println("\n❌ Error: Invalid category ID value. Please enter a valid number for '--category'\n");
+                return;
+            }
 
-        JSONArray expenses = FileManager.readExpensesJson("out/data" + File.separator + "expenses.csv");
-        System.out.println("# ID  Date        Description      Amount");
-        for (int i = 0; i < expenses.length(); i++) {
-            JSONObject expense = expenses.getJSONObject(i);
-            System.out.printf("# %-3d %-10s  %-15s  %.2f%n", expense.getInt("id"), expense.getString("date"), expense.getString("description"), expense.getDouble("amount"));
+            int categoryIndex = 0;
+
+            for (int i = 0; i < expenseFilesData.categoryIds().length; i++) {
+                if (expenseFilesData.categoryIds()[i] == categoryId) {
+                    categoryIndex = i;
+                    break;
+                }
+            }
+            
+            String categoryFileName = expenseFilesData.fileNames()[categoryIndex];
+            File categoryFile = new File(categoryFileName);
+            if (!categoryFile.exists()) {
+                System.out.println("\n❌ Error: Category with ID " + categoryId + " does not exist. Please check the category ID and try again.\n");
+                return;
+            }
+            System.out.println("\n📂 Category : " + getCategoryNameById(categoryId));
+            JSONArray expenses = FileManager.readExpensesJson(categoryFileName);
+            if (expenses.length() < 1) {
+                System.out.println("No expenses found in this category.");
+                return;
+            }
+            System.out.println("# ID  Date        Description      Amount");
+            for (int j = 0; j < expenses.length(); j++) {
+                JSONObject expense = expenses.getJSONObject(j);
+                System.out.printf("# %-3d %-10s  %-15s  %.2f%n", expense.getInt("id"), expense.getString("date"), expense.getString("description"), expense.getDouble("amount"));
+            }
+            return;
+        }
+
+        for (int i = 0; i < expenseFilesData.fileNames().length; i++) {
+            String fileName = expenseFilesData.fileNames()[i];
+            int categoryId = expenseFilesData.categoryIds()[i];
+            System.out.println("\n📂 Category : " + getCategoryNameById(categoryId));
+            JSONArray expenses = FileManager.readExpensesJson(fileName);
+            if (expenses.length() < 1) {
+                System.out.println("No expenses found in this category.");
+                continue;
+            }
+            System.out.println("# ID  Date        Description      Amount");
+            for (int j = 0; j < expenses.length(); j++) {
+                JSONObject expense = expenses.getJSONObject(j);
+                System.out.printf("# %-3d %-10s  %-15s  %.2f%n", expense.getInt("id"), expense.getString("date"), expense.getString("description"), expense.getDouble("amount"));
+            }
         }
     }
 
@@ -221,5 +267,16 @@ public class Executor {
     public static void printCategories() {
         System.out.println("\n📂 Expense Categories:");
         Executor.handlelistCategories(null, null, null);
+    }
+
+    private static String getCategoryNameById(int categoryId) {
+        JSONArray categories = FileManager.getCategories();
+        for (int i = 0; i < categories.length(); i++) {
+            JSONObject category = categories.getJSONObject(i);
+            if (category.getInt("id") == categoryId) {
+                return category.getString("name");
+            }
+        }
+        return "Unknown";
     }
 }

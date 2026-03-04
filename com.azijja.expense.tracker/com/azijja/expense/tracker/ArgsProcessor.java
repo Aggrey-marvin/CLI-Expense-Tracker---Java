@@ -24,20 +24,27 @@ public class ArgsProcessor {
         }
 
         // Confirm passed args number
-        String [] expectedParams = command.getParameters();
-        if (args.length - 1 < expectedParams.length * 2) {
+        String [] mandatoryParams = command.getParameters();
+        String [] optionalParams = command.getOptionalParameters();
+        String [] expectedParams = new String[mandatoryParams.length + optionalParams.length];
+        System.arraycopy(mandatoryParams, 0, expectedParams, 0, mandatoryParams.length);
+        System.arraycopy(optionalParams, 0, expectedParams, mandatoryParams.length, optionalParams.length);
+        if (args.length - 1 < mandatoryParams.length * 2) {
             System.out.println("\n❌ Error: Missing parameters for command '" + command.name().toLowerCase() + "'");
             System.out.print("Expected parameters: ");
-            for (String param : expectedParams) {
+            for (String param : mandatoryParams) {
                 System.out.print("<" + param + "> <value>");
             }
             System.out.println("\n");
             return null;
-        } else if (args.length - 1 > expectedParams.length * 2) {
+        } else if (args.length - 1 > ((mandatoryParams.length * 2) + (optionalParams.length * 2))) {
             System.out.println("\n❌ Error: Too many parameters for command '" + command.name().toLowerCase() + "'");
             System.out.print("Expected parameters: ");
-            for (String param : expectedParams) {
+            for (String param : mandatoryParams) {
                 System.out.print("<" + param + "> ");
+            }
+            for (String param : optionalParams) {
+                System.out.print("[" + param + "] - optional ");
             }
             System.out.println("\n");
             return null;
@@ -47,7 +54,7 @@ public class ArgsProcessor {
         String [] allArgs = new String[args.length - 1];
         System.arraycopy(args, 1, allArgs, 0, args.length - 1);
 
-        for (String arg : expectedParams) {
+        for (String arg : mandatoryParams) {
             if (!Arrays.asList(allArgs).contains(arg)) {
                 System.out.println("\n❌ Error: Missing parameter '<" + arg + ">' for command '" + command.name().toLowerCase() + "'\n");
                 return null;
@@ -62,6 +69,14 @@ public class ArgsProcessor {
                 commandArgs.add(aarg);
             } else {
                 commandValues.add(aarg);
+            }
+        }
+
+        // Check for invalid args
+        for (String carg: commandArgs) {
+            if (!Arrays.asList(expectedParams).contains(carg)) {
+                System.out.println("\n❌ Error: Invalid parameter '" + carg + "' for command '" + command.name().toLowerCase() + "'\n");
+                return null;
             }
         }
 

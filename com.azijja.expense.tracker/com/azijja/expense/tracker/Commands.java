@@ -22,4 +22,8 @@ public enum Commands {
     public String [] getParameters() {
         return CommandDetails.parameters.get(this);
     }
+
+    public String [] getOptionalParameters() {
+        return CommandDetails.optionalParameters.get(this);
+    }
 }

@@ -88,6 +88,7 @@ public class FileManager {
             }
             return expenses;
         } catch (IOException e) {
+            System.out.println("Error reading from CSV file: " + e.getMessage());
             return new JSONArray();
         }
     }
@@ -158,7 +159,7 @@ public class FileManager {
             String[] fileNames = new String[files.length];
             int [] categoryIds = new int[files.length];
             for (int i = 0; i < files.length; i++) {
-                fileNames[i] = files[i].getName();
+                fileNames[i] = DATA_DIR + "/" + files[i].getName();
                 String[] parts = files[i].getName().split("_");
                 if (parts.length >= 3) {
                     try {
