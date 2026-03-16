@@ -139,13 +139,20 @@ public class Executor {
     }
 
     private static void handleSummary(ArrayList<String> commandArgs, ArrayList<String> valueArgs, String formattedDate) {
-        JSONArray allExpenses = FileManager.readExpensesJson("out/data" + File.separator + "expenses.csv");
-        double total = 0.0;
-        for (int i = 0; i < allExpenses.length(); i++) {
-            JSONObject expense = allExpenses.getJSONObject(i);
-            total += expense.getDouble("amount");
+        ExpenseFileData expenseFilesData = FileManager.getExpenseFiles();
+
+        for (int i = 0; i < expenseFilesData.fileNames().length; i++) {
+            String fileName = expenseFilesData.fileNames()[i];
+            int categoryId = expenseFilesData.categoryIds()[i];
+            JSONArray expenses = FileManager.readExpensesJson(fileName);
+            double total = 0.0;
+            for (int j = 0; j < expenses.length(); j++) {
+                JSONObject expense = expenses.getJSONObject(j);
+                total += expense.getDouble("amount");
+            }
+            System.out.printf("Total for Category '%s': %.2f%n", getCategoryNameById(categoryId), total);
         }
-        System.out.printf("Total Expenses: %.2f%n", total);
+        
     }
 
     private static void handleDelete(ArrayList<String> commandArgs, ArrayList<String> valueArgs, String formattedDate) {

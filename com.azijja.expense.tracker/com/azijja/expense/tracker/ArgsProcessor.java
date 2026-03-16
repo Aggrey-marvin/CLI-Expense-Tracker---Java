@@ -26,6 +26,7 @@ public class ArgsProcessor {
         // Confirm passed args number
         String [] mandatoryParams = command.getParameters();
         String [] optionalParams = command.getOptionalParameters();
+        
         String [] expectedParams = new String[mandatoryParams.length + optionalParams.length];
         System.arraycopy(mandatoryParams, 0, expectedParams, 0, mandatoryParams.length);
         System.arraycopy(optionalParams, 0, expectedParams, mandatoryParams.length, optionalParams.length);
