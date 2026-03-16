@@ -24,6 +24,7 @@ public enum Commands {
     }
 
     public String [] getOptionalParameters() {
-        return CommandDetails.optionalParameters.get(this);
+        String[] optional = CommandDetails.optionalParameters.get(this);
+        return optional != null ? optional : new String[0];
     }
 }

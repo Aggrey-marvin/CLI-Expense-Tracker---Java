@@ -24,6 +24,12 @@ public class CommandDetails {
         parameters.put(Commands.LIST_CATEGORIES, new String[]{});
         parameters.put(Commands.DELETE_CATEGORY, new String[]{"--id"});
 
+        optionalParameters.put(Commands.ADD, new String[]{});
         optionalParameters.put(Commands.LIST, new String[]{"--category"});
+        optionalParameters.put(Commands.SUMMARY, new String[]{});
+        optionalParameters.put(Commands.DELETE, new String[]{});
+        optionalParameters.put(Commands.CREATE_CATEGORY, new String[]{});
+        optionalParameters.put(Commands.LIST_CATEGORIES, new String[]{});
+        optionalParameters.put(Commands.DELETE_CATEGORY, new String[]{});
     }
 }

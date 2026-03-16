@@ -156,18 +156,41 @@ public class Executor {
     }
 
     private static void handleDelete(ArrayList<String> commandArgs, ArrayList<String> valueArgs, String formattedDate) {
-        JSONArray currentExpenses = FileManager.readExpensesJson("out/data" + File.separator + "expenses.csv");
+        int idToDelete = -1;
         try {
-            Integer.parseInt(valueArgs.get(commandArgs.indexOf("--id")));
+            idToDelete = Integer.parseInt(valueArgs.get(commandArgs.indexOf("--id")));
         } catch (NumberFormatException e) {
             System.out.println("\n❌ Error: Invalid ID value. Please enter a valid number for '--id'\n");
             return;
         }
-        int idToDelete = Integer.parseInt(valueArgs.get(commandArgs.indexOf("--id")));
+
+        ExpenseFileData expenseFilesData = FileManager.getExpenseFiles();
+
+        for (int i = 0; i < expenseFilesData.fileNames().length; i++) {
+            String fileName = expenseFilesData.fileNames()[i];
+            JSONArray expenses = FileManager.readExpensesJson(fileName);
+            for (int j = 0; j < expenses.length(); j++) {
+                JSONObject expense = expenses.getJSONObject(j);
+                if (expense.getInt("id") == idToDelete) {
+                    String result = deleteExpenseById(idToDelete, expenses);
+                    if (result != null) {
+                        FileManager.writeExpenseToCsv(fileName, result);
+                        System.out.println("Expense with ID " + idToDelete + " deleted successfully.");
+                    } else {
+                        System.out.println("\n❌ Error: Expense with ID " + idToDelete + " not found.\n");
+                    }
+                    return;
+                }
+            }
+        }
+        
+    }
+
+    private static String deleteExpenseById(int idToDelete, JSONArray expenses) {
         JSONArray updatedExpenses = new JSONArray();
         boolean found = false;
-        for (int i = 0; i < currentExpenses.length(); i++) {
-            JSONObject expense = currentExpenses.getJSONObject(i);
+        for (int i = 0; i < expenses.length(); i++) {
+            JSONObject expense = expenses.getJSONObject(i);
             if (expense.getInt("id") != idToDelete) {
                 updatedExpenses.put(expense);
             } else {
@@ -176,7 +199,7 @@ public class Executor {
         }
         if (found) {
             // Rewrite CSV file
-            StringBuilder csvContent = new StringBuilder("id,description,amount,date\n");
+            StringBuilder csvContent = new StringBuilder("id,date,description,amount\n");
             for (int i = 0; i < updatedExpenses.length(); i++) {
                 JSONObject expense = updatedExpenses.getJSONObject(i);
                 csvContent.append(expense.getInt("id")).append(",")
@@ -185,10 +208,10 @@ public class Executor {
                             .append(expense.getDouble("amount")).append("\n");
             }
 
-            String filePath = "out/data" + File.separator + "expenses.csv";
-            FileManager.writeExpenseToCsv(filePath, csvContent.toString());
-            System.out.println("Expense with ID " + idToDelete + " deleted successfully.");
-        }  
+            return csvContent.toString();
+        } else {
+            return null;
+        }
     }
 
     private static void handleCreateCategory(ArrayList<String> commandArgs, ArrayList<String> valueArgs, String formattedDate) {
